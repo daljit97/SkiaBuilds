@@ -20,7 +20,7 @@ jobs:
           git checkout chrome/m121
           git apply ../enable_opengl_winarm64.patch
           python tools/git-sync-deps
-          gn gen out/Shared --args="clang_win=\`"C:/Program Files/LLVM\`" target_cpu=\"arm64\" is_official_build=true is_component_build=true skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_system_libwebp=false skia_use_system_libpng=false skia_use_system_zlib=false skia_use_system_icu=false skia_use_system_harfbuzz=false skia_use_system_expat=false"
+          gn gen out/Shared --args="clang_win=\`"C:/Program Files/LLVM\`" target_cpu=\`"arm64\`" is_official_build=true is_component_build=true skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_system_libwebp=false skia_use_system_libpng=false skia_use_system_zlib=false skia_use_system_icu=false skia_use_system_harfbuzz=false skia_use_system_expat=false"
           ninja -C out/Shared
           # Zip build files
           mkdir skia_build
