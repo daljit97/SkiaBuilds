@@ -14,6 +14,9 @@ jobs:
       - name: Clone and Build Skia
         run: |
           git clone 'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
+          # Check depot_tools from 2023 to ensure compatibility with building m121 of Skia
+          cd depot_tools && git checkout c1c1fb626b7bce758d19549b5b435100ea44a6c3
+          cd ..
           $env:PATH += ";${PWD}/depot_tools"
           git clone https://skia.googlesource.com/skia.git
           cd skia
