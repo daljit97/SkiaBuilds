@@ -1,0 +1,34 @@
+name: Build Skia Windows
+on: [workflow_dispatch]
+jobs:
+  BuildSkia:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Clone and Build Skia
+        run: |
+          git clone 'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
+          $env:PATH += ";${PWD}/depot_tools"
+          git clone https://skia.googlesource.com/skia.git
+          cd skia
+          git apply ../enable_opengl_winarm64.patch
+          python tools/git-sync-deps
+          gn gen out/Shared --args="clang_win=\`"C:/Program Files/LLVM\`" target_cpu=\"arm64\" is_official_build=true is_component_build=true skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_system_libwebp=false skia_use_system_libpng=false skia_use_system_zlib=false skia_use_system_icu=false skia_use_system_harfbuzz=false skia_use_system_expat=false"
+          ninja -C out/Shared
+          # Zip build files
+          mkdir skia_build
+          cp -r include/ skia_build/include/
+          cp out/Shared/skia.dll skia_build/skia.dll
+          cp out/Shared/skia.dll.lib skia_build/skia.dll.lib
+          Compress-Archive -Path skia_build -DestinationPath skia_build_windows.zip
+          
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3.0.0
+        with: 
+          name: skia_win_x64
+          path: skia/skia_build_windows.zip
+          if-no-files-found: error
