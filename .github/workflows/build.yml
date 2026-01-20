@@ -58,6 +58,12 @@ jobs:
         if: matrix.os == 'linux'
         run: python3 tools/git-sync-deps
 
+      - name: Patch fetch-gn for Windows ARM64
+        if: matrix.os == 'windows' && matrix.arch == 'arm64'
+        run: |
+          (Get-Content bin\fetch-gn) -replace "'arm64': 'arm64'","'arm64': 'amd64'" | Set-Content bin\fetch-gn
+        shell: pwsh
+
       - name: Sync dependencies (Windows)
         if: matrix.os == 'windows'
         run: python tools/git-sync-deps
