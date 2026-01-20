@@ -12,4 +12,4 @@ jobs:
       - name: Install LLVM (Windows)
         uses: KyleMayes/install-llvm-action@v2
         with:
-          version: "21"
+          version: "21.1.8"
