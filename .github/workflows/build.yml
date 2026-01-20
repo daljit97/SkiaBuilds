@@ -69,13 +69,19 @@ jobs:
         run: python tools/git-sync-deps
         shell: pwsh
 
+      - name: Install LLVM (Windows)
+        if: matrix.os == 'windows'
+        uses: KyleMayes/install-llvm-action@v2
+        with:
+          version: "18.1"
+
       - name: Generate build files (Linux)
         if: matrix.os == 'linux'
         run: bin/gn gen out/Shared --args='is_official_build=true is_component_build=true target_cpu="${{ matrix.target_cpu }}" cc="clang" cxx="clang++" skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_egl=true skia_use_system_libwebp=false'
 
       - name: Generate build files (Windows)
         if: matrix.os == 'windows'
-        run: .\bin\gn gen out/Shared --args='is_official_build=true is_component_build=true target_cpu="${{ matrix.target_cpu }}" clang_win="C:\Program Files\LLVM" is_trivial_abi=false skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_egl=true skia_use_system_libwebp=false'
+        run: .\bin\gn gen out/Shared --args='is_official_build=true is_component_build=true target_cpu="${{ matrix.target_cpu }}" clang_win="C:\Program Files\LLVM" clang_win_version="18.1" is_trivial_abi=false skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_egl=true skia_use_system_libwebp=false'
         shell: pwsh
 
       - name: Build (Linux)
