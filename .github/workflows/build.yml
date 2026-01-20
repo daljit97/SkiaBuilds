@@ -49,8 +49,9 @@ jobs:
       - name: Install Linux dependencies
         if: matrix.os == 'linux'
         run: |
-          sudo ./tools/install_dependencies.sh
+          sudo sed -i.bak 's|mirror+file:/etc/apt/apt-mirrors.txt|http://azure.archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list
           sudo apt-get update
+          sudo ./tools/install_dependencies.sh
           sudo apt-get install -y clang
 
       - name: Sync dependencies (Linux)
