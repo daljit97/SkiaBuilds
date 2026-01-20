@@ -1,87 +1,87 @@
 name: Build Skia Shared Libraries
 
 on:
-	workflow_dispatch:
-		inputs:
-			skia_ref:
-				description: "Skia branch, tag, or commit to build"
-				required: true
-				default: "main"
+  workflow_dispatch:
+    inputs:
+      skia_ref:
+        description: "Skia branch, tag, or commit to build"
+        required: true
+        default: "main"
 
 jobs:
-	build:
-		name: ${{ matrix.os }} ${{ matrix.arch }}
-		runs-on: ${{ matrix.runner }}
-		strategy:
-			fail-fast: false
-			matrix:
-				include:
-					- os: linux
-						arch: x64
-						runner: ubuntu-latest
-						target_cpu: "x64"
-					- os: linux
-						arch: arm64
-						runner: ubuntu-24.04-arm
-						target_cpu: "arm64"
-					- os: windows
-						arch: x64
-						runner: windows-2022
-						target_cpu: "x64"
-					- os: windows
-						arch: arm64
-						runner: windows-11-arm
-						target_cpu: "arm64"
+  build:
+    name: ${{ matrix.os }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: linux
+            arch: x64
+            runner: ubuntu-latest
+            target_cpu: "x64"
+          - os: linux
+            arch: arm64
+            runner: ubuntu-24.04-arm
+            target_cpu: "arm64"
+          - os: windows
+            arch: x64
+            runner: windows-2022
+            target_cpu: "x64"
+          - os: windows
+            arch: arm64
+            runner: windows-11-arm
+            target_cpu: "arm64"
 
-		steps:
-			- name: Checkout Skia
-				uses: actions/checkout@v4
-				with:
-					repository: daljit97/skia
-					ref: ${{ inputs.skia_ref }}
-					fetch-depth: 0
+    steps:
+      - name: Checkout Skia
+        uses: actions/checkout@v4
+        with:
+          repository: daljit97/skia
+          ref: ${{ inputs.skia_ref }}
+          fetch-depth: 0
 
-			- name: Setup Python
-				uses: actions/setup-python@v5
-				with:
-					python-version: "3.11"
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-			- name: Install Linux dependencies
-				if: matrix.os == 'linux'
-				run: |
-					sudo ./tools/install_dependencies.sh
-					sudo apt-get update
-					sudo apt-get install -y clang
+      - name: Install Linux dependencies
+        if: matrix.os == 'linux'
+        run: |
+          sudo ./tools/install_dependencies.sh
+          sudo apt-get update
+          sudo apt-get install -y clang
 
-			- name: Sync dependencies (Linux)
-				if: matrix.os == 'linux'
-				run: python3 tools/git-sync-deps
+      - name: Sync dependencies (Linux)
+        if: matrix.os == 'linux'
+        run: python3 tools/git-sync-deps
 
-			- name: Sync dependencies (Windows)
-				if: matrix.os == 'windows'
-				run: python tools/git-sync-deps
-				shell: pwsh
+      - name: Sync dependencies (Windows)
+        if: matrix.os == 'windows'
+        run: python tools/git-sync-deps
+        shell: pwsh
 
-			- name: Generate build files (Linux)
-				if: matrix.os == 'linux'
-				run: bin/gn gen out/Shared --args='is_official_build=true is_component_build=true target_cpu="${{ matrix.target_cpu }}" cc="clang" cxx="clang++" skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_egl=true skia_use_system_libwebp=false'
+      - name: Generate build files (Linux)
+        if: matrix.os == 'linux'
+        run: bin/gn gen out/Shared --args='is_official_build=true is_component_build=true target_cpu="${{ matrix.target_cpu }}" cc="clang" cxx="clang++" skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_egl=true skia_use_system_libwebp=false'
 
-			- name: Generate build files (Windows)
-				if: matrix.os == 'windows'
-				run: .\bin\gn gen out\Shared --args="is_official_build=true is_component_build=true target_cpu=\"${{ matrix.target_cpu }}\" clang_win=\"C:\\Program Files\\LLVM\" is_trivial_abi=false skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_egl=true skia_use_system_libwebp=false"
-				shell: pwsh
+      - name: Generate build files (Windows)
+        if: matrix.os == 'windows'
+        run: .\bin\gn gen out\Shared --args="is_official_build=true is_component_build=true target_cpu=\"${{ matrix.target_cpu }}\" clang_win=\"C:\\Program Files\\LLVM\" is_trivial_abi=false skia_use_system_harfbuzz=false skia_use_system_libjpeg_turbo=false skia_use_egl=true skia_use_system_libwebp=false"
+        shell: pwsh
 
-			- name: Build (Linux)
-				if: matrix.os == 'linux'
-				run: ninja -C out/Shared
+      - name: Build (Linux)
+        if: matrix.os == 'linux'
+        run: ninja -C out/Shared
 
-			- name: Build (Windows)
-				if: matrix.os == 'windows'
-				run: ninja -C out\Shared
-				shell: pwsh
+      - name: Build (Windows)
+        if: matrix.os == 'windows'
+        run: ninja -C out\Shared
+        shell: pwsh
 
-			- name: Upload artifacts
-				uses: actions/upload-artifact@v4
-				with:
-					name: skia-${{ matrix.os }}-${{ matrix.arch }}
-					path: out/Shared/**
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: skia-${{ matrix.os }}-${{ matrix.arch }}
+          path: out/Shared/**
