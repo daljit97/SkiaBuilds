@@ -9,7 +9,3 @@ jobs:
     runs-on: windows-2022
     name: Test
     steps:
-      - name: Install LLVM (Windows)
-        uses: KyleMayes/install-llvm-action@v2.0.8
-        with:
-          version: "21.1.2"
