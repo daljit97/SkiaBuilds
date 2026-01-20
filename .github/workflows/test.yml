@@ -10,7 +10,6 @@ jobs:
     name: Test
     steps:
       - name: Install LLVM (Windows)
-        if: matrix.os == 'windows'
         uses: KyleMayes/install-llvm-action@v2
         with:
           version: "20.1.8"
