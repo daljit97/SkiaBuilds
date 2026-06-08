@@ -56,6 +56,8 @@ jobs:
 
       - name: Sync dependencies (Linux)
         if: matrix.os == 'linux'
+        env:
+          GIT_SYNC_DEPS_SKIP_EMSDK: "1"
         run: python3 tools/git-sync-deps
 
       - name: Patch fetch-gn for Windows ARM64
@@ -66,6 +68,8 @@ jobs:
 
       - name: Sync dependencies (Windows)
         if: matrix.os == 'windows'
+        env:
+          GIT_SYNC_DEPS_SKIP_EMSDK: "1"
         run: python tools/git-sync-deps
         shell: pwsh
 
