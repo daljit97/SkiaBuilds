@@ -90,11 +90,11 @@ jobs:
 
       - name: Build (Linux)
         if: matrix.os == 'linux'
-        run: ninja -C out/Shared
+        run: ninja -C out/Shared skia
 
       - name: Build (Windows)
         if: matrix.os == 'windows'
-        run: ninja -C out/Shared
+        run: ninja -C out/Shared skia
         shell: pwsh
 
       - name: Upload artifacts
